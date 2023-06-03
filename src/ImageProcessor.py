@@ -53,11 +53,13 @@ class ImageProcessor:
             predicted_label (int, optional): predicted label. Defaults to 0.
         """
         image = cv.imread(image_path)
-        
+
         meta = pd.read_csv("data/meta.csv")
-        predicted_name = meta[meta["classId"] == predicted_label]["description"].values[0]
+        predicted_name = meta[meta["classId"] == predicted_label]["description"].values[
+            0
+        ]
         plot_title = f"Predicted label: {predicted_label} - {predicted_name}"
-        
+
         # plot image with label and predicted label
         plt.imshow(image)
         plt.title(plot_title)

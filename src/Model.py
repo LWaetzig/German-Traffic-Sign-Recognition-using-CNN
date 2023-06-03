@@ -29,7 +29,9 @@ class Model:
         )
         self.model = model
 
-    def train_model(self, train_data, train_labels, epochs: int = 10, batch_size: int = 32, **kwargs):
+    def train_model(
+        self, train_data, train_labels, epochs: int = 10, batch_size: int = 32, **kwargs
+    ):
         model = self.model
         if model is None:
             print("No model to train")
@@ -38,25 +40,29 @@ class Model:
             print("Training with validation data")
             X_val = kwargs.get("X_val")
             y_val = kwargs.get("y_val")
-            model.fit(train_data, train_labels, epochs=epochs, batch_size=batch_size, validation_data=(X_val, y_val))
+            model.fit(
+                train_data,
+                train_labels,
+                epochs=epochs,
+                batch_size=batch_size,
+                validation_data=(X_val, y_val),
+            )
         else:
             model.fit(train_data, train_labels, epochs=epochs, batch_size=batch_size)
 
     def predict(self, image: np.array) -> int:
-        
         model = self.model
         if model is None:
             print("No model to predict")
             return
-        
+
         prediction = model.predict(image)
         return prediction
 
-
     def evaluate(
         self,
-        test_data : np.array,
-        test_labels : np.array,
+        test_data: np.array,
+        test_labels: np.array,
     ) -> None:
         pass
 

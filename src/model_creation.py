@@ -49,11 +49,18 @@ model.save_model(model_path="models")
 # Test model
 model = Model(model_name="model_1_test")
 model.load_model(model_path="models/model_1.h5")
-test_image = processor.preprocess_images(image_path="data/Test/00000.png", image_size=(32, 32), convert_to_grayscale=False, sharpen=True)
+test_image = processor.preprocess_images(
+    image_path="data/Test/00000.png",
+    image_size=(32, 32),
+    convert_to_grayscale=False,
+    sharpen=True,
+)
 test_image = np.expand_dims(test_image, axis=0)
 test_image = np.array(test_image)
 prediction = np.argmax(model.predict(test_image))
 
 
 # Plot image with prediction
-processor.show_image(image_path="data/Test/00000.png", label=16, predicted_label=prediction)
+processor.show_image(
+    image_path="data/Test/00000.png", label=16, predicted_label=prediction
+)
