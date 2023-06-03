@@ -1,65 +1,25 @@
 import os
-
-import cv2
-import numpy as np
-from sklearn.metrics import classification_report
-from sklearn.model_selection import GridSearchCV
+import cv2 as vs
 from tensorflow import keras
+from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+import numpy as np
 
 
 class Model:
-    def __init__(self, image_size=(32, 32), color="RGB"):
-        """
-        Initialisierungsmethode:
-        image_size: Gewünschte Größe zur Formatierung der Bilder.                           Werte: (32, 32) oder andere Zahlen einsetzen.
-        color: Angeben ob das Modell mit Farbbildern oder Graustufen arbeiten soll.         Werte: 'RGB' oder 'GRAY'
-        """
-        self.image_size = image_size
-
-        if color == "GRAY":
-            self.colorload = cv2.IMREAD_GRAYSCALE
-            self.colorchannels = 1
-        else:
-            self.colorload = cv2.IMREAD_COLOR
-            self.colorchannels = 3
-
+    def __init__(self, model_name: str = "model") -> None:
+        self.model_name = model_name
         self.model = None
+        self.accuracy = None
+        print(f"Model: {self.model_name} created")
 
-    def load_image(self, image_path, image_size):
-        img = cv2.imread(image_path, self.colorload)
-        img = cv2.resize(img, image_size)
-        img = img / 255.0
-        return img
-
-    def load_data(self, df, image_size):
-        images = []
-        labels = []
-        for i, row in df.iterrows():
-            path = row["Path"]
-            label = row["ClassId"]
-            image_path = os.path.join(path)
-            image = self.load_image(image_path, image_size)
-            images.append(image)
-            labels.append(label)
-        return np.array(images), np.array(labels)
-
-    def create_model(self, num_classes):
+    def create_model(self, num_classes: int, image_shape: tuple = (32, 32, 3)):
         model = keras.Sequential(
             [
-                keras.layers.Conv2D(
-                    32,
-                    (3, 3),
-                    activation="relu",
-                    input_shape=(
-                        self.image_size[0],
-                        self.image_size[1],
-                        self.colorchannels,
-                    ),
-                ),
-                keras.layers.MaxPooling2D((2, 2)),
-                keras.layers.Flatten(),
-                keras.layers.Dense(64, activation="relu"),
-                keras.layers.Dense(num_classes, activation="softmax"),
+                Conv2D(32, (3, 3), activation="relu", input_shape=image_shape),
+                MaxPooling2D((2, 2)),
+                Flatten(),
+                Dense(64, activation="relu"),
+                Dense(num_classes, activation="softmax"),
             ]
         )
         model.compile(
@@ -67,49 +27,66 @@ class Model:
             loss=keras.losses.SparseCategoricalCrossentropy(),
             metrics=["accuracy"],
         )
-        return model
+        self.model = model
 
-    def find_best_hyperparams(self, param_grid, train_images, train_labels, cv=3):
-        keras_model = keras.wrappers.scikit_learn.KerasClassifier(
-            build_fn=self.create_model, verbose=1
-        )
+    def train_model(self, train_data, train_labels, epochs: int = 10, batch_size: int = 32, **kwargs):
+        model = self.model
+        if model is None:
+            print("No model to train")
+            return
+        if kwargs:
+            print("Training with validation data")
+            X_val = kwargs.get("X_val")
+            y_val = kwargs.get("y_val")
+            model.fit(train_data, train_labels, epochs=epochs, batch_size=batch_size, validation_data=(X_val, y_val))
+        else:
+            model.fit(train_data, train_labels, epochs=epochs, batch_size=batch_size)
 
-        # Grid-Suche durchführen
-        grid_search = GridSearchCV(estimator=keras_model, param_grid=param_grid, cv=cv)
-        grid_search.fit(train_images, train_labels)
+    def predict(self, image: np.array) -> int:
+        
+        model = self.model
+        if model is None:
+            print("No model to predict")
+            return
+        
+        prediction = model.predict(image)
+        return prediction
 
-        # Beste Hyperparameter auslesen
-        best_params = grid_search.best_params_
 
-        return best_params
+    def evaluate(
+        self,
+        test_data : np.array,
+        test_labels : np.array,
+    ) -> None:
+        pass
 
-    def train_model(self, train_df, validation_split=0.2, batch_size=16, epochs=10):
-        train_images, train_labels = self.load_data(train_df, self.image_size)
+    def save_model(self, model_path: str = "models") -> None:
+        """Save model to path. Model will be saved as .h5 file.
 
-        num_classes = len(np.unique(train_labels))
+        Args:
+            model_path (str, optional): Path to where model should be saved. Defaults to "models".
+        """
+        if self.model is None:
+            print("No model to save")
+            return
 
-        self.model = self.create_model(num_classes)
-        self.model.fit(
-            train_images,
-            train_labels,
-            epochs=epochs,
-            batch_size=batch_size,
-            validation_split=validation_split,
-        )
+        if not os.path.exists(model_path):
+            print(f"Created directory: {model_path}")
+            os.mkdir(model_path)
 
-    def evaluate_model(self, test_df):
-        test_images, test_labels = self.load_data(test_df, self.image_size)
-        predictions = self.model.predict(test_images)
-        predicted_labels = np.argmax(predictions, axis=1)
-        report = classification_report(test_labels, predicted_labels)
-        return report
+        model_path = os.path.join(model_path, f"{self.model_name}.h5")
+        self.model.save(model_path)
+        print(f"Model {self.model_name} saved to {model_path}")
 
-    def model_prediction(self, image_path):
-        image = self.load_image(image_path, self.image_size)
-        image = np.expand_dims(image, axis=0)
-        prediction = self.model.predict(image)
-        predicted_label = np.argmax(prediction)
-        return predicted_label
+    def load_model(self, model_path: str = "model") -> None:
+        """Load existing model from path. Model has to be saved as .h5 file.
 
-    def load_model(self, model_path):
+        Args:
+            model_path (str, optional): Path to model. Defaults to "model".
+        """
+        if not os.path.exists(model_path):
+            print(f"No such file or directory to load model: {model_path}")
+            return
+
         self.model = keras.models.load_model(model_path)
+        print(f"Model {self.model_name} loaded from {model_path}")
