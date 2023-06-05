@@ -40,27 +40,34 @@ X_train, X_val, y_train, y_val = train_test_split(
 num_classes = len(set(y_train))
 
 # Create model
-model = Model(model_name="model_1")
+model = Model(model_name="model_2")
 model.create_model(num_classes=num_classes, image_shape=(32, 32, 3))
 model.train_model(X_train, y_train, epochs=10, batch_size=32, X_val=X_val, y_val=y_val)
 model.save_model(model_path="models")
 
 
 # Test model
-model = Model(model_name="model_1_test")
-model.load_model(model_path="models/model_1.h5")
-test_image = processor.preprocess_images(
-    image_path="data/Test/00000.png",
-    image_size=(32, 32),
-    convert_to_grayscale=False,
-    sharpen=True,
-)
-test_image = np.expand_dims(test_image, axis=0)
-test_image = np.array(test_image)
-prediction = np.argmax(model.predict(test_image))
+test_data = os.path.join("data", "test")
+test_csv = pd.read_csv(os.path.join("data", "test.csv"), index_col=0)
 
+model = Model(model_name="model_2_test")
+model.load_model("models/model_2.h5")
 
-# Plot image with prediction
-processor.show_image(
-    image_path="data/Test/00000.png", label=16, predicted_label=prediction
-)
+processor = ImageProcessor()
+
+test_images = list()
+test_labels = list()
+for i , row in tqdm(test_csv.iterrows()):
+    path = os.path.join(row["Path"])
+    label = row["classId"]
+    image = processor.preprocess_images(
+        image_path=path, image_size=(32, 32), convert_to_grayscale=False, sharpen=True
+    )
+    image = np.expand_dims(image, axis=0)
+    test_images.append(image)
+    test_labels.append(label)
+
+test_images = np.array(test_images)
+test_labels = np.array(test_labels)
+
+model.evaluate(test_images, test_labels)
