@@ -3,22 +3,34 @@ import cv2 as vs
 from tensorflow import keras
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 import numpy as np
+from tqdm import tqdm
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    classification_report,
+    f1_score,
+    precision_score,
+    recall_score,
+)
 
 
-class Model:
+class Model():
     def __init__(self, model_name: str = "model") -> None:
         self.model_name = model_name
         self.model = None
         self.accuracy = None
+        self.precision = None
+        self.recall = None
+        self.f1_score = None
         print(f"Model: {self.model_name} created")
 
     def create_model(self, num_classes: int, image_shape: tuple = (32, 32, 3)):
         model = keras.Sequential(
             [
-                Conv2D(32, (3, 3), activation="relu", input_shape=image_shape),
+                Conv2D(96, (3, 3), activation="relu", input_shape=image_shape),
                 MaxPooling2D((2, 2)),
                 Flatten(),
-                Dense(64, activation="relu"),
+                Dense(128, activation="relu"),
                 Dense(num_classes, activation="softmax"),
             ]
         )
@@ -64,7 +76,32 @@ class Model:
         test_data: np.array,
         test_labels: np.array,
     ) -> None:
-        pass
+        model = self.model
+        if model is None:
+            print("No model to evaluate")
+            return
+
+        predicted_labels = list()
+        for image in test_data:
+            prediction = np.argmax(model.predict(image, use_multiprocessing=True))
+            predicted_labels.append(prediction)
+
+        self.accuracy = accuracy_score(test_labels, predicted_labels)
+        self.precision = precision_score(test_labels, predicted_labels, average="macro")
+        self.recall = recall_score(test_labels, predicted_labels, average="macro")
+        self.f1_score = f1_score(test_labels, predicted_labels, average="macro")
+        conf_matrix = confusion_matrix(test_labels, predicted_labels)
+        class_report = classification_report(test_labels, predicted_labels)
+
+        print(f"Accuracy: {self.accuracy}")
+        print(f"Precision: {self.precision}")
+        print(f"Recall: {self.recall}")
+        print(f"F1 score: {self.f1_score}")
+        print()
+        print(f"Confusion matrix: \n{conf_matrix}")
+
+        print()
+        print(f"Classification report: \n{class_report}")
 
     def save_model(self, model_path: str = "models") -> None:
         """Save model to path. Model will be saved as .h5 file.
@@ -83,6 +120,16 @@ class Model:
         model_path = os.path.join(model_path, f"{self.model_name}.h5")
         self.model.save(model_path)
         print(f"Model {self.model_name} saved to {model_path}")
+        if self.accuracy is not None:
+            metrics = {
+                "accuracy": self.accuracy,
+                "precision": self.precision,
+                "recall": self.recall,
+                "f1_score": self.f1_score,
+            }
+            with open(os.path.join(model_path, f"{self.model_name}_metrics.json"), "w") as f:
+                f.write(str(metrics))
+
 
     def load_model(self, model_path: str = "model") -> None:
         """Load existing model from path. Model has to be saved as .h5 file.
@@ -96,3 +143,5 @@ class Model:
 
         self.model = keras.models.load_model(model_path)
         print(f"Model {self.model_name} loaded from {model_path}")
+
+
