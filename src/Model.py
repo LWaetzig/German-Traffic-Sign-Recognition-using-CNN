@@ -1,17 +1,12 @@
 import os
+
 import cv2 as vs
-from tensorflow import keras
-from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 import numpy as np
-from tqdm import tqdm
-from sklearn.metrics import (
-    accuracy_score,
-    confusion_matrix,
-    classification_report,
-    f1_score,
-    precision_score,
-    recall_score,
-)
+from keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPooling2D
+from sklearn.metrics import (accuracy_score, classification_report,
+                             confusion_matrix, f1_score, precision_score,
+                             recall_score)
+from tensorflow import keras
 
 
 class Model():
@@ -26,18 +21,23 @@ class Model():
 
     def create_model(self, num_classes: int, image_shape: tuple = (32, 32, 3)):
         model = keras.Sequential(
-            [
-                Conv2D(96, (3, 3), activation="relu", input_shape=image_shape),
-                MaxPooling2D((2, 2)),
-                Flatten(),
-                Dense(128, activation="relu"),
-                Dense(num_classes, activation="softmax"),
-            ]
+        [
+            Conv2D(64, (3, 3), activation="relu", input_shape=(32, 32, 3)),
+            Conv2D(64, (3, 3), activation="relu"),
+            MaxPooling2D((2, 2)),
+            Conv2D(128, (3, 3), activation="relu"),
+            Conv2D(128, (3, 3), activation="relu"),
+            MaxPooling2D((2, 2)),
+            Flatten(),
+            Dense(256, activation="relu"),
+            Dropout(0.5),
+            Dense(128, activation="relu"),
+            Dropout(0.5),
+            Dense(43, activation="softmax"),
+        ]
         )
         model.compile(
-            optimizer="adam",
-            loss=keras.losses.SparseCategoricalCrossentropy(),
-            metrics=["accuracy"],
+            optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
         )
         self.model = model
 
