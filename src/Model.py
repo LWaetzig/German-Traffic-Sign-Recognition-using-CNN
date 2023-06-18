@@ -22,7 +22,7 @@ class Model():
     def create_model(self, num_classes: int, image_shape: tuple = (32, 32, 3)):
         model = keras.Sequential(
         [
-            Conv2D(64, (3, 3), activation="relu", input_shape=(32, 32, 3)),
+            Conv2D(64, (3, 3), activation="relu", input_shape=image_shape),
             Conv2D(64, (3, 3), activation="relu"),
             MaxPooling2D((2, 2)),
             Conv2D(128, (3, 3), activation="relu"),
@@ -33,7 +33,7 @@ class Model():
             Dropout(0.5),
             Dense(128, activation="relu"),
             Dropout(0.5),
-            Dense(43, activation="softmax"),
+            Dense(num_classes, activation="softmax"),
         ]
         )
         model.compile(
