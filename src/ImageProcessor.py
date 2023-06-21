@@ -1,3 +1,5 @@
+import os
+
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
@@ -41,8 +43,113 @@ class ImageProcessor:
         image = image / 255.0
         return image
 
-    def augment_data(self) -> None:
-        pass
+    def augment_image(
+        self,
+        image_path: str,
+        rotation: bool = True,
+        zoom: bool = True,
+        noise: bool = True,
+        rotation_range: tuple = (0, 90),
+        zoom_range: tuple = (0.8, 1.2),
+        noise_range: tuple = (0, 5),
+    ) -> pd.DataFrame:
+        """Augment images for training. Apply some filters to the images.
+
+        Args:
+            image_path (str): path to image
+            rotation (bool, optional): Descide whether image should be rotated. Defaults to True.
+            zoom (bool, optional): Descide wether zoom filter should be applied. Defaults to True.
+            noise (bool, optional): Descide wether noise filter should be applied. Defaults to True.
+            rotation_range (tuple, optional): Range in which the rotation factor is selected randomly . Defaults to (0, 90).
+            zoom_range (tuple, optional): Range in which the zoom factor is selected randomly. Defaults to (0.8, 1.2).
+            noise_range (tuple, optional): Range in which the noise factor is selected randomly. Defaults to (0, 5).
+
+        Returns:
+            pd.DataFrame: DataFrame with path to augmented image and corresponding classId
+        """
+        df_augmented = pd.DataFrame()
+
+        image = cv.imread(image_path)
+
+        if rotation == True:
+            # create rotation matrix
+            height, width = image.shape[:2]
+            center = (width // 2, height // 2)
+            rotation_matrix = cv.getRotationMatrix2D(center, rotation_range, 1.0)
+            # rotate image
+            rotated_image = cv.warpAffine(image, rotation_matrix, (width, height))
+            # save image and add to dataframe
+            rotated_image_path = os.path.join(
+                f"{image_path.replace('.png' , '_rotated.png')}"
+            )
+            new_row = pd.DataFrame(
+                {
+                    "Width": 0,
+                    "Height": 0,
+                    "Roi.X1": 0,
+                    "Roi.Y1": 0,
+                    "Roi.X2": 0,
+                    "Roi.Y2": 0,
+                    "classId": int(image_path.split("/")[-2]),
+                    "Path": rotated_image_path,
+                },
+                index=[0],
+            )
+            df_augmented = pd.concat([df_augmented, new_row]).reset_index(drop=True)
+            cv.imwrite(rotated_image_path, rotated_image)
+
+        if zoom == True:
+            # apply zoom
+            zoom_factor = np.random.uniform(*zoom_range)
+            zoomed_image = cv.resize(image, None, fx=zoom_factor, fy=zoom_factor)
+            # save image and add to dataframe
+            zoomed_image_path = os.path.join(
+                f"{image_path.replace('.png' , '_zoomed.png')}"
+            )
+            new_row = pd.DataFrame(
+                {
+                    "Width": 0,
+                    "Height": 0,
+                    "Roi.X1": 0,
+                    "Roi.Y1": 0,
+                    "Roi.X2": 0,
+                    "Roi.Y2": 0,
+                    "classId": int(image_path.split("/")[-2]),
+                    "Path": zoomed_image_path,
+                },
+                index=[0],
+            )
+            df_augmented = pd.concat([df_augmented, new_row]).reset_index(drop=True)
+            cv.imwrite(zoomed_image_path, zoomed_image)
+
+        if noise == True:
+            # apply noise to image
+            noise_level = np.random.uniform(*noise_range)
+            noise = np.random.normal(scale=noise_level, size=image.shape).astype(
+                np.uint8
+            )
+            noisy_image = cv.add(image, noise)
+            # save image and add to dataframe
+            noisy_image_path = os.path.join(
+                f"{image_path.replace('.png' , '_noisy.png')}"
+            )
+            new_row = pd.DataFrame(
+                {
+                    "Width": 0,
+                    "Height": 0,
+                    "Roi.X1": 0,
+                    "Roi.Y1": 0,
+                    "Roi.X2": 0,
+                    "Roi.Y2": 0,
+                    "classId": int(image_path.split("/")[-2]),
+                    "Path": noisy_image_path,
+                },
+                index=[0],
+            )
+            df_augmented = pd.concat([df_augmented, new_row]).reset_index(drop=True)
+            cv.imwrite(noisy_image_path, noisy_image)
+
+        return df_augmented
 
     def show_image(self, image_path: str, predicted_label: int = 0) -> None:
         """Plot image with acutal label and predicted label.
