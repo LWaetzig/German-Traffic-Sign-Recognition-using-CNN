@@ -7,6 +7,7 @@ from sklearn.metrics import (accuracy_score, classification_report,
                              confusion_matrix, f1_score, precision_score,
                              recall_score)
 from tensorflow import keras
+from tqdm import tqmd
 
 
 class Model():
@@ -82,7 +83,7 @@ class Model():
             return
 
         predicted_labels = list()
-        for image in test_data:
+        for image in tqmd(test_data):
             prediction = np.argmax(model.predict(image, use_multiprocessing=True))
             predicted_labels.append(prediction)
 
@@ -127,7 +128,7 @@ class Model():
                 "recall": self.recall,
                 "f1_score": self.f1_score,
             }
-            with open(os.path.join(model_path, f"{self.model_name}_metrics.json"), "w") as f:
+            with open(os.path.join(model_path.replace("h5", ".json"), "w")) as f:
                 f.write(str(metrics))
 
 

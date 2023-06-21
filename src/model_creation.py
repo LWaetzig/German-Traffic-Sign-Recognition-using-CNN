@@ -10,7 +10,7 @@ from Model import Model
 
 # Set paths to data and csv files
 train_data = os.path.join("data", "train")
-train_csv = pd.read_csv(os.path.join("data", "train.csv"), index_col=0)
+train_csv = pd.read_csv(os.path.join("data", "augmented_train.csv"), index_col=0)
 test_data = os.path.join("data", "test")
 test_csv = pd.read_csv(os.path.join("data", "test.csv"), index_col=0)
 
@@ -40,7 +40,7 @@ X_train, X_val, y_train, y_val = train_test_split(
 num_classes = len(set(y_train))
 
 # Create model
-model = Model(model_name="model_2")
+model = Model(model_name="model_3")
 model.create_model(num_classes=num_classes, image_shape=(32, 32, 3))
 model.train_model(X_train, y_train, epochs=10, batch_size=32, X_val=X_val, y_val=y_val)
 model.save_model(model_path="models")
@@ -50,7 +50,7 @@ model.save_model(model_path="models")
 test_data = os.path.join("data", "test")
 test_csv = pd.read_csv(os.path.join("data", "test.csv"), index_col=0)
 
-model = Model(model_name="model_2_test")
+model = Model(model_name="model_3_test")
 model.load_model("models/model_2.h5")
 
 processor = ImageProcessor()
@@ -71,3 +71,9 @@ test_images = np.array(test_images)
 test_labels = np.array(test_labels)
 
 model.evaluate(test_images, test_labels)
+model.save_model(model_path="models")
+
+model.accuracy
+model.precision
+model.recall
+model.f1_scor

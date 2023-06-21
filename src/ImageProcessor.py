@@ -73,9 +73,10 @@ class ImageProcessor:
 
         if rotation == True:
             # create rotation matrix
+            rotation_factor = np.random.uniform(*rotation_range)
             height, width = image.shape[:2]
             center = (width // 2, height // 2)
-            rotation_matrix = cv.getRotationMatrix2D(center, rotation_range, 1.0)
+            rotation_matrix = cv.getRotationMatrix2D(center, rotation_factor, 1.0)
             # rotate image
             rotated_image = cv.warpAffine(image, rotation_matrix, (width, height))
             # save image and add to dataframe
