@@ -1,13 +1,12 @@
 import os
 
-import cv2 as vs
 import numpy as np
 from keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPooling2D
 from sklearn.metrics import (accuracy_score, classification_report,
                              confusion_matrix, f1_score, precision_score,
                              recall_score)
 from tensorflow import keras
-from tqdm import tqmd
+from tqdm import tqdm
 
 
 class Model():
@@ -83,7 +82,7 @@ class Model():
             return
 
         predicted_labels = list()
-        for image in tqmd(test_data):
+        for image in tqdm(test_data):
             prediction = np.argmax(model.predict(image, use_multiprocessing=True))
             predicted_labels.append(prediction)
 
