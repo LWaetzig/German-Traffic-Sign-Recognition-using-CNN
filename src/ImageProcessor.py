@@ -4,6 +4,8 @@ import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
+from sklearn.model_selection import train_test_split
 
 
 class ImageProcessor:
@@ -42,6 +44,28 @@ class ImageProcessor:
         # normalize pixel values
         image = image / 255.0
         return image
+    
+    def create_dataset(self, df : pd.DataFrame, train_split : bool, **kwargs) -> tuple:
+
+        images = list()
+        labels = list()
+
+        for i , row in tqdm(df.iterrows()):
+            path = os.path.join(row["Path"])
+            label = row["classId"]
+            image = self.preprocess_images(image_path=path, image_size=(32, 32), convert_to_grayscale=False, sharpen=True)
+            images.append(image)
+            labels.append(label)
+
+        images = np.array(images)
+        labels = np.array(labels)
+
+        if train_split == True:
+            X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2, random_state=42)
+            return X_train, X_val, y_train, y_val
+        else:
+            return images, labels
+
 
     def augment_image(
         self,
@@ -173,3 +197,5 @@ class ImageProcessor:
         plt.title(plot_title)
         plt.axis("off")
         plt.show()
+
+
