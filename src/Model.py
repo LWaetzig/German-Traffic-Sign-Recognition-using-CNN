@@ -1,12 +1,12 @@
 import os
 
-import cv2 as vs
 import numpy as np
 from keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPooling2D
 from sklearn.metrics import (accuracy_score, classification_report,
                              confusion_matrix, f1_score, precision_score,
                              recall_score)
 from tensorflow import keras
+from tqdm import tqdm
 
 
 class Model():
@@ -22,7 +22,7 @@ class Model():
     def create_model(self, num_classes: int, image_shape: tuple = (32, 32, 3)):
         model = keras.Sequential(
         [
-            Conv2D(64, (3, 3), activation="relu", input_shape=(32, 32, 3)),
+            Conv2D(64, (3, 3), activation="relu", input_shape=image_shape),
             Conv2D(64, (3, 3), activation="relu"),
             MaxPooling2D((2, 2)),
             Conv2D(128, (3, 3), activation="relu"),
@@ -33,7 +33,7 @@ class Model():
             Dropout(0.5),
             Dense(128, activation="relu"),
             Dropout(0.5),
-            Dense(43, activation="softmax"),
+            Dense(num_classes, activation="softmax"),
         ]
         )
         model.compile(
@@ -82,7 +82,7 @@ class Model():
             return
 
         predicted_labels = list()
-        for image in test_data:
+        for image in tqdm(test_data):
             prediction = np.argmax(model.predict(image, use_multiprocessing=True))
             predicted_labels.append(prediction)
 
@@ -127,7 +127,7 @@ class Model():
                 "recall": self.recall,
                 "f1_score": self.f1_score,
             }
-            with open(os.path.join(model_path, f"{self.model_name}_metrics.json"), "w") as f:
+            with open(os.path.join(model_path.replace("h5", ".json"), "w")) as f:
                 f.write(str(metrics))
 
 
