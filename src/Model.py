@@ -175,7 +175,7 @@ class Model:
                     }
                 }
             }
-            with open(os.path.join(model_path.replace(".h5", ".json"), "w")) as f:
+            with open(os.path.join(model_path.replace(".h5", ".json")), "w") as f:
                 json.dump(metrics, f)
 
     def load_model(self, model_path: str = "model.h5") -> None:
