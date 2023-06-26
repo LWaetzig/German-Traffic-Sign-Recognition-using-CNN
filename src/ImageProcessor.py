@@ -48,10 +48,10 @@ class ImageProcessor:
     def create_dataset(
         self, df: pd.DataFrame, train_split: bool, data_set_type: str
     ) -> tuple:
-        """_summary_
+        """Create dataset for training and testing.
 
         Args:
-            df (pd.DataFrame): DataFrame with path to images and corresponding classId
+            df (pd.DataFrame): DataFrame with path to images and corresponding labels
             train_split (bool): Decide if train data should be splitted into train and validation data
             data_set_type (str): Specify if train or test data should be processed
 
