@@ -44,16 +44,34 @@ class ImageProcessor:
         # normalize pixel values
         image = image / 255.0
         return image
-    
-    def create_dataset(self, df : pd.DataFrame, train_split : bool, **kwargs) -> tuple:
 
+    def create_dataset(
+        self, df: pd.DataFrame, train_split: bool, data_set_type: str
+    ) -> tuple:
+        """_summary_
+
+        Args:
+            df (pd.DataFrame): DataFrame with path to images and corresponding classId
+            train_split (bool): Decide if train data should be splitted into train and validation data
+            data_set_type (str): Specify if train or test data should be processed
+
+        Returns:
+            tuple: tuple of numpy arrays with images and labels
+        """
         images = list()
         labels = list()
 
-        for i , row in tqdm(df.iterrows()):
+        for i, row in tqdm(df.iterrows()):
             path = os.path.join(row["Path"])
             label = row["classId"]
-            image = self.preprocess_images(image_path=path, image_size=(32, 32), convert_to_grayscale=False, sharpen=True)
+            image = self.preprocess_images(
+                image_path=path,
+                image_size=(32, 32),
+                convert_to_grayscale=False,
+                sharpen=True,
+            )
+            if data_set_type == "test":
+                image = np.expand_dims(image, axis=0)
             images.append(image)
             labels.append(label)
 
@@ -61,11 +79,12 @@ class ImageProcessor:
         labels = np.array(labels)
 
         if train_split == True:
-            X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2, random_state=42)
+            X_train, X_val, y_train, y_val = train_test_split(
+                images, labels, test_size=0.2, random_state=42
+            )
             return X_train, X_val, y_train, y_val
         else:
             return images, labels
-
 
     def augment_image(
         self,
@@ -197,5 +216,3 @@ class ImageProcessor:
         plt.title(plot_title)
         plt.axis("off")
         plt.show()
-
-
