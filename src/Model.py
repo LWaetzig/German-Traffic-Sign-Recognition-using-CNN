@@ -1,3 +1,4 @@
+import json
 import os
 
 import numpy as np
@@ -6,7 +7,6 @@ from sklearn.metrics import (accuracy_score, classification_report,
                              confusion_matrix, f1_score, precision_score,
                              recall_score)
 from tensorflow import keras
-from tqdm import tqdm
 
 
 class Model():
@@ -82,7 +82,7 @@ class Model():
             return
 
         predicted_labels = list()
-        for image in tqdm(test_data):
+        for image in test_data:
             prediction = np.argmax(model.predict(image, use_multiprocessing=True))
             predicted_labels.append(prediction)
 
@@ -122,13 +122,17 @@ class Model():
         print(f"Model {self.model_name} saved to {model_path}")
         if self.accuracy is not None:
             metrics = {
-                "accuracy": self.accuracy,
-                "precision": self.precision,
-                "recall": self.recall,
-                "f1_score": self.f1_score,
+                self.model_name : {
+                    "metrics" : {
+                        "accuracy": self.accuracy,
+                        "precision": self.precision,
+                        "recall": self.recall,
+                        "f1_score": self.f1_score,
+                    }
+                }
             }
-            with open(os.path.join(model_path.replace("h5", ".json"), "w")) as f:
-                f.write(str(metrics))
+            with open(os.path.join(model_path.replace(".h5", ".json"), "w")) as f:
+                json.dump(metrics, f)
 
 
     def load_model(self, model_path: str = "model") -> None:
