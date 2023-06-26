@@ -121,9 +121,9 @@ test_csv = pd.read_csv(os.path.join("data", "test.csv"), index_col=0)
 processor = ImageProcessor()
 
 # train and validation data preprocessing
-X_train, X_val, y_train, y_val = processor.create_dataset(train_csv, train_split=True)
+X_train, X_val, y_train, y_val = processor.create_dataset(train_csv, train_split=True, data_set_type="train")
 # test data preprocessing
-test_images, test_labels = processor.create_dataset(test_csv, train_split=False)
+test_images, test_labels = processor.create_dataset(test_csv, train_split=False, data_set_type="test")
 
 # perform Grid Search
 keras_model = KerasClassifier(model=create_model, verbose=1)
