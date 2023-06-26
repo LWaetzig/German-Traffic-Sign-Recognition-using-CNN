@@ -20,7 +20,12 @@ mean = int(np.mean(list(groups.values())).round(0))
 fig, axes = plt.subplots(figsize=(10, 10))
 axes.bar(groups.keys(), groups.values())
 axes.hlines(
-    y=np.mean(list(groups.values())), xmin=0, xmax=43, color="red", linestyles="dashed", label="Mean"
+    y=np.mean(list(groups.values())),
+    xmin=0,
+    xmax=43,
+    color="red",
+    linestyles="dashed",
+    label="Mean",
 )
 for i, value in enumerate(groups.values()):
     if value < np.mean(list(groups.values())):
@@ -65,7 +70,9 @@ for group, group_df in tqdm(df.groupby("classId")):
                 new_path = path.replace("Train", "Bkp")
                 if not os.path.exists("/".join(new_path.split("/")[:-1])):
                     os.makedirs("/".join(new_path.split("/")[:-1]))
-                if path.replace("Train" , "Bkp") not in os.listdir("/".join(new_path.split("/")[:-1])):
+                if path.replace("Train", "Bkp") not in os.listdir(
+                    "/".join(new_path.split("/")[:-1])
+                ):
                     shutil.copy(path, new_path)
                     row = df[df["Path"] == path].index
                     df = df.drop(index=row.values)
@@ -82,9 +89,7 @@ for group, group_df in new_df.groupby("classId"):
 # create plot
 fig, axes = plt.subplots(figsize=(10, 10))
 axes.bar(groups.keys(), groups.values())
-axes.hlines(
-    y=mean, xmin=0, xmax=43, color="red", linestyles="dashed", label="Mean"
-)
+axes.hlines(y=mean, xmin=0, xmax=43, color="red", linestyles="dashed", label="Mean")
 axes.set_title("Class distribution after augmentation")
 axes.set_xlabel("Class")
 axes.set_ylabel("Number of images")

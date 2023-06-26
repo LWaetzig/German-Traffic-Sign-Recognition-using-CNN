@@ -28,7 +28,6 @@ num_classes = len(set(y_train))
 model = Model(model_name="model_3")
 model.create_model(num_classes=num_classes, image_shape=(32, 32, 3))
 model.train_model(X_train, y_train, epochs=10, batch_size=64, X_val=X_val, y_val=y_val)
-model.save_model(model_path="models")
 
 # Evaluate Model
 model.evaluate(test_images, test_labels)

@@ -8,8 +8,6 @@ from src.Model import Model
 
 
 def main(args):
-
-
     model_path = os.path.join(args.model)
     image_path = os.path.join(args.image)
 
@@ -27,21 +25,32 @@ def main(args):
 
     print("Preprocess image")
     processor = ImageProcessor()
-    image = processor.preprocess_images(image_path=image_path, image_size=(32, 32), convert_to_grayscale=False, sharpen=True)
+    image = processor.preprocess_images(
+        image_path=image_path,
+        image_size=(32, 32),
+        convert_to_grayscale=False,
+        sharpen=True,
+    )
     image = np.expand_dims(image, axis=0)
     image = np.array(image)
-    
+
     print("Try to predict image")
     prediction = np.argmax(model.predict(image))
 
     processor.show_image(image_path=image_path, predicted_label=prediction)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--image", "-i", type=str, required=True, help='Path to image')
-    parser.add_argument("--model", "-m", type=str, required=True, help='Path to model to use for prediction')
+    parser.add_argument("--image", "-i", type=str, required=True, help="Path to image")
+    parser.add_argument(
+        "--model",
+        "-m",
+        type=str,
+        required=True,
+        help="Path to model to use for prediction",
+    )
     args = parser.parse_args()
-    
+
     main(args)
