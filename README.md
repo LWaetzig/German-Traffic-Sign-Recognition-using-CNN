@@ -47,4 +47,6 @@ python main.py -i "data/Examples/test1.jpg" -m "models/model_3.h5"
 
 ## Object Detection
 We also developed an object detection using pretrained models from the tensorflow model zoo and the tensorflow api. Due to a huge amount of computing power we used Google Colab. Follow this [link](https://colab.research.google.com/drive/1KaH1XNzDOWr7oWnatquFtEvylNYIjjBk#scrollTo=n-74rTbe32Iw) to the notebook.
-If you want to use this notebook you have to import the necessary data -> [GoogleDrive](https://drive.google.com/file/d/1cWV0v5xCU8sR588Bv2Z_FRitkhB0Rhl0/view?usp=sharing)
+If you want to use this notebook you have to import the necessary data -> 
+- [Images](https://drive.google.com/file/d/1cWV0v5xCU8sR588Bv2Z_FRitkhB0Rhl0/view?usp=sharing)
+- [Model](https://drive.google.com/drive/folders/1Z9528-ZzwHr-KPHkeT4BjLhKx9rwFjys?usp=sharing)
