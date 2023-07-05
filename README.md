@@ -27,7 +27,7 @@ Group Members:
 - [main.py](main.py): script to run the detection with a trained model
 
 ## Run Application
-- install the [required packages](requirements.txt)
+- install the required [packages](requirements.txt)
 ```bash
 pip install -r requirements.txt
 ```
