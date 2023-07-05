@@ -27,6 +27,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 .vscode/**
+*.zip
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -125,3 +126,6 @@ dmypy.json
 # ignore mac trash file
 .DS_Store
 
+# exclude documentation
+*.mp4
+*.pdf
