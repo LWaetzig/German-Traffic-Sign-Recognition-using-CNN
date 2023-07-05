@@ -11,6 +11,7 @@ def main(args):
     model_path = os.path.join(args.model)
     image_path = os.path.join(args.image)
 
+    # check if image and model exist
     if not os.path.exists(model_path):
         print(f"Error: Model {model_path} does not exist")
         return
