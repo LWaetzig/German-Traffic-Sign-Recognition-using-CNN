@@ -3,14 +3,9 @@ import os
 
 import numpy as np
 from keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPooling2D
-from sklearn.metrics import (
-    accuracy_score,
-    classification_report,
-    confusion_matrix,
-    f1_score,
-    precision_score,
-    recall_score,
-)
+from sklearn.metrics import (accuracy_score, classification_report,
+                             confusion_matrix, f1_score, precision_score,
+                             recall_score)
 from tensorflow import keras
 
 
@@ -62,7 +57,7 @@ class Model:
         batch_size: int = 16,
         **kwargs,
     ):
-        """Train model on train and validation set
+        """Train model on train (and validation) set
 
         Args:
             train_data (_type_): NumPy array with processed train images
@@ -89,7 +84,7 @@ class Model:
             model.fit(train_data, train_labels, epochs=epochs, batch_size=batch_size)
 
     def predict(self, image: np.array) -> int:
-        """_summary_
+        """Perform prediction on image(s)
 
         Args:
             image (np.array): Processed image as numpy array

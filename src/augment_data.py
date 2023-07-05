@@ -10,13 +10,15 @@ from src.ImageProcessor import ImageProcessor
 
 df = pd.read_csv(r"data/train.csv", index_col=0)
 
-# Display class distribution before augmentation
+# group by classId and get the number of images per class
 groups = dict()
-
 for group, group_df in df.groupby("classId"):
     groups[group] = len(group_df)
+
+# compute mean of images over all classes
 mean = int(np.mean(list(groups.values())).round(0))
 
+# Display class distribution before augmentation
 fig, axes = plt.subplots(figsize=(10, 10))
 axes.bar(groups.keys(), groups.values())
 axes.hlines(
@@ -48,13 +50,16 @@ processor = ImageProcessor()
 augmented_df = pd.DataFrame()
 
 for group, group_df in tqdm(df.groupby("classId")):
+    # processing underrepresented classes
     if len(group_df) < mean:
+        # mulitply images by 3 using rotation, zoom and noise
         if len(group_df) <= 500:
             for path in group_df["Path"]:
                 test = processor.augment_image(
                     path, rotation=True, zoom=True, noise=True
                 )
                 augmented_df = pd.concat([augmented_df, test]).reset_index(drop=True)
+        # mulitply images by 2 using rotation and zoom
         elif len(group_df) > 500:
             for path in group_df["Path"]:
                 test = processor.augment_image(
@@ -62,6 +67,7 @@ for group, group_df in tqdm(df.groupby("classId")):
                 )
                 augmented_df = pd.concat([augmented_df, test]).reset_index(drop=True)
 
+    # processing overrepresented classes (delete random images)
     else:
         if np.abs(len(group_df) - mean) >= 700:
             images = list()

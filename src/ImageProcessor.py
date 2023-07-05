@@ -43,6 +43,7 @@ class ImageProcessor:
 
         # normalize pixel values
         image = image / 255.0
+
         return image
 
     def create_dataset(
