@@ -4,7 +4,7 @@
 ## What is this?
 TLDR: This is a German Traffic Sign Recognition based on a CNN.
 
-Project for the Lecture Data Exploration at DHBW Mannheim. The goal is to detect German Traffic Signs with a CNN. The dataset ist from the [German Traffic Sign Recognition Benchmark](http://benchmark.ini.rub.de/?section=gtsrb&subsection=dataset). The dataset contains 43 different classes with 39.209 training images and 12.630 test images.
+Project for the Lecture Data Exploration at DHBW Mannheim. The goal is to detect German Traffic Signs with a CNN. The dataset ist from the [German Traffic Sign Recognition Benchmark](http://benchmark.ini.rub.de/?section=gtsrb&subsection=dataset) and contains 43 different classes with 39.209 training images and 12.630 test images.
 
 Group Members:
   - [Nicholas Link](https://github.com/Nicho-Link)
